@@ -1,9 +1,40 @@
 import { useState } from 'react'
 
+
+const AvgCalculator = (good, neutral, bad, all) => {
+  const avg = (
+    (good * 1) +
+    (neutral * 0) +
+    (bad * -1)
+  )
+    / all
+  return avg
+}
+
+const positivePctCalculator = (good, all) => {
+  const pct = (
+    (good / all) * 100
+  )
+  return pct
+}
+
+const Statistics = (props) => {
+  return (
+    <div>
+      <h1>statistics</h1>
+      <p>good {props.good}</p>
+      <p>neutral {props.neutral}</p>
+      <p>bad {props.bad}</p>
+      <p>all {props.all}</p>
+      <p>average {props.average}</p>
+      <p>positive {props.positivePct} %</p>
+    </div>
+  )
+}
+
 const Button = ({ handleClick, text }) => (
   <button onClick={handleClick}>{text}</button>
 )
-
 
 
 const App = () => {
@@ -16,30 +47,15 @@ const App = () => {
   const [average, setAvg] = useState(0)
   const [positivePct, setPositivePct] = useState(0)
 
-  const AvgCalculator = (good, neutral, bad, all) => {
-    const avg = (
-      (good * 1) +
-      (neutral * 0) +
-      (bad * -1)
-    )
-      / all
-    setAvg(avg)
-  }
-
-  const positivePctCalculator = (good, all) => {
-    const pct = (
-      (good / all) * 100
-    )
-    setPositivePct(pct)
-  }
 
   const handleGoodClick = () => {
     const updatedGood = good + 1
     const updatedAll = updatedGood + neutral + bad
     setGood(updatedGood)
     setAll(updatedAll)
-    AvgCalculator(updatedGood, neutral, bad, updatedAll)
-    positivePctCalculator(updatedGood, updatedAll)
+    setAvg(AvgCalculator(updatedGood, neutral, bad, updatedAll))
+    setPositivePct(positivePctCalculator(updatedGood, updatedAll))
+
   }
 
   const handeNeutralClick = () => {
@@ -47,8 +63,8 @@ const App = () => {
     const updatedAll = good + updatedNeutral + bad
     setNeutral(updatedNeutral)
     setAll(updatedAll)
-    AvgCalculator(good, updatedNeutral, bad, updatedAll)
-    positivePctCalculator(good, updatedAll)
+    setAvg(AvgCalculator(good, updatedNeutral, bad, updatedAll))
+    setPositivePct(positivePctCalculator(good, updatedAll))
   }
 
   const handleBadClick = () => {
@@ -56,8 +72,8 @@ const App = () => {
     const updatedAll = good + neutral + updatedBad
     setBad(updatedBad)
     setAll(updatedAll)
-    AvgCalculator(good, neutral, updatedBad, updatedAll)
-    positivePctCalculator(good, updatedAll)
+    setAvg(AvgCalculator(good, neutral, updatedBad, updatedAll))
+    setPositivePct(positivePctCalculator(good, updatedAll))
   }
 
   return (
@@ -66,14 +82,7 @@ const App = () => {
       <Button handleClick={handleGoodClick} text='good' />
       <Button handleClick={handeNeutralClick} text='neutral' />
       <Button handleClick={handleBadClick} text='bad' />
-      <h1>statistics</h1>
-      <p>good {good}</p>
-      <p>neutral {neutral}</p>
-      <p>bad {bad}</p>
-      <p>all {all}</p>
-      <p>average {average}</p>
-      <p>positive {positivePct} %</p>
-
+      <Statistics good={good} neutral={neutral} bad={bad} all={all} average={average} positivePct={positivePct} />
     </div>
   )
 }
