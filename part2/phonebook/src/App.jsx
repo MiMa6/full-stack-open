@@ -1,5 +1,55 @@
 import { useState } from 'react'
 
+const PersonForm = ({ addPerson,
+  newName,
+  newNumber,
+  handePersonNameChange,
+  handePersonNumberChange
+}) => {
+  return (
+    <div>
+      <form onSubmit={addPerson}>
+        name: <input
+          value={newName}
+          onChange={handePersonNameChange}
+        />
+      </form>
+      <form onSubmit={addPerson}>
+        number: <input
+          value={newNumber}
+          onChange={handePersonNumberChange}
+        />
+      </form>
+    </div>
+  )
+}
+
+const Filter = ({ value, onChange }) => {
+  return (
+    <div>
+      filter shown with
+      <input
+        type="search"
+        value={value}
+        onChange={onChange}
+      ></input>
+    </div>
+  )
+}
+
+const Persons = ({ persons, newSearch }) => {
+  return (
+    <div>
+      {persons.filter(
+        person => {
+          return person.name.toLowerCase().includes(newSearch.toLowerCase())
+        }
+      ).map(person =>
+        <Person key={person.name} person={person} />
+      )}
+    </div>
+  )
+}
 
 const Person = ({ person }) => {
   return (
@@ -35,7 +85,7 @@ const App = () => {
       window.alert(`${personObject.name} is already added to phonebook`)
     } else {
       setPersons(persons.concat(personObject))
-      console.log('New person added:', personObject.name)
+      console.log(`New person added: ${personObject.name}`)
     }
     setNewName('')
     setNewNumber('')
@@ -59,37 +109,29 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      filter shown with<input
-        type="search"
+
+      <Filter
         value={newSearch}
         onChange={handleSearchedPersonChange}
-      ></input>
+      />
+
       <h2>add a new</h2>
-      <form onSubmit={addPerson}>
-        name: <input
-          value={newName}
-          onChange={handePersonNameChange}
-        />
-      </form>
-      <form onSubmit={addPerson}>
-        number: <input
-          value={newNumber}
-          onChange={handePersonNumberChange}
-        />
-      </form>
-      <div>
-        <button onClick={addPerson}>
-          add
-        </button>
-      </div>
+
+      <PersonForm
+        addPerson={addPerson}
+        newName={newName}
+        newNumber={newNumber}
+        handePersonNameChange={handePersonNameChange}
+        handePersonNumberChange={handePersonNumberChange}
+      />
+
       <h2>Numbers</h2>
-      {persons.filter(
-        person => {
-          return person.name.toLowerCase().includes(newSearch.toLowerCase())
-        }
-      ).map(person =>
-        <Person key={person.name} person={person} />
-      )}
+
+      <Persons
+        persons={persons}
+        newSearch={newSearch}
+      />
+
     </div>
   )
 }
