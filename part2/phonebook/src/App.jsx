@@ -22,9 +22,16 @@ const App = () => {
       name: newName,
     }
 
-    setPersons(persons.concat(personObject))
+    const checkPersonName = persons.some(person =>
+      person.name === newName
+    )
+    if (checkPersonName) {
+      window.alert(`${personObject.name} is already added to phonebook`)
+    } else {
+      setPersons(persons.concat(personObject))
+      console.log('New person added:', personObject.name)
+    }
     setNewName('')
-    console.log('New person added')
   }
 
   const handePersonCHange = (event) => {
