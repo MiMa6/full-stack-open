@@ -4,7 +4,7 @@ import { useState } from 'react'
 const Person = ({ person }) => {
   return (
     <div>
-      <b>{person.name}</b>
+      <p>{person.name} {person.number}</p>
     </div>
   )
 }
@@ -14,12 +14,13 @@ const App = () => {
     { name: 'Arto Hellas' }
   ])
   const [newName, setNewName] = useState('')
-
+  const [newNumber, setNewNumber] = useState('')
 
   const addPerson = (event) => {
     event.preventDefault()
     const personObject = {
       name: newName,
+      number: newNumber
     }
 
     const checkPersonName = persons.some(person =>
@@ -32,13 +33,18 @@ const App = () => {
       console.log('New person added:', personObject.name)
     }
     setNewName('')
+    setNewNumber('')
   }
 
-  const handePersonCHange = (event) => {
+  const handePersonNameChange = (event) => {
     console.log(event.target.value)
     setNewName(event.target.value)
   }
 
+  const handePersonNumberChange = (event) => {
+    console.log(event.target.value)
+    setNewNumber(event.target.value)
+  }
 
   return (
     <div>
@@ -46,12 +52,20 @@ const App = () => {
       <form onSubmit={addPerson}>
         name: <input
           value={newName}
-          onChange={handePersonCHange}
+          onChange={handePersonNameChange}
         />
-        <div>
-          <button type="submit">add</button>
-        </div>
       </form>
+      <form onSubmit={addPerson}>
+        number: <input
+          value={newNumber}
+          onChange={handePersonNumberChange}
+        />
+      </form>
+      <div>
+        <button onClick={addPerson}>
+          add
+        </button>
+      </div>
       <h2>Numbers</h2>
       {persons.map(person =>
         <Person key={person.name} person={person} />
