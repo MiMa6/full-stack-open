@@ -21,6 +21,10 @@ const PersonForm = ({ addPerson,
           onChange={handePersonNumberChange}
         />
       </form>
+      <button onClick={addPerson}>
+        add
+      </button>
+
     </div>
   )
 }
@@ -87,17 +91,36 @@ const App = () => {
       number: newNumber
     }
 
-    const checkPersonName = persons.some(person =>
+    const checkPersonName = persons.find(person =>
       person.name === newName
     )
-    if (checkPersonName) {
-      window.alert(`${personObject.name} is already added to phonebook`)
+    if (checkPersonName != undefined) {
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one`)) {
+        personService
+          .updatePerson(checkPersonName.id, personObject)
+          .then(returnedPerson => {
+            setPersons(persons.map(person =>
+              person.name !== newName
+                ? person
+                : returnedPerson
+            ))
+            console.log(`Person: ${returnedPerson.name} number updated`)
+          })
+          .catch(error => {
+            console.log('failed to update person')
+            console.log(error)
+          })
+      }
     } else {
       personService
         .create(personObject)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
           console.log(`New person added: ${returnedPerson.name}`)
+        })
+        .catch(error => {
+          console.log('failed to add person')
+          console.log(error)
         })
     }
     setNewName('')
@@ -113,7 +136,7 @@ const App = () => {
           console.log(`Person deleted: ${name}`)
         })
         .catch(error => {
-          console.log('fail')
+          console.log('failed to delete person')
           console.log(error)
         })
     }
