@@ -1,5 +1,6 @@
 import { useState, useEffect} from 'react'
 import personService from './services/persons'
+import './index.css'
 
 const PersonForm = ({ addPerson,
   newName,
@@ -67,12 +68,25 @@ const Person = ({ person, delPersonClick }) => {
   )
 }
 
+const SuccessfulNotification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className='successful'>
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newSearch, setNewSearch] = useState('')
+  const [successfulMessage, setSuccessfulMessage] = useState(null)
 
   useEffect(() => {
     console.log('effect')
@@ -104,6 +118,8 @@ const App = () => {
                 ? person
                 : returnedPerson
             ))
+            setSuccessfulMessage(`Number of ${returnedPerson.name} updated`)
+            setTimeout(() => {setSuccessfulMessage(null)}, 5000)
             console.log(`Person: ${returnedPerson.name} number updated`)
           })
           .catch(error => {
@@ -116,6 +132,8 @@ const App = () => {
         .create(personObject)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
+          setSuccessfulMessage(`Added ${returnedPerson.name}`)
+          setTimeout(() => {setSuccessfulMessage(null)}, 5000)
           console.log(`New person added: ${returnedPerson.name}`)
         })
         .catch(error => {
@@ -161,6 +179,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <SuccessfulNotification message={successfulMessage} />
 
       <Filter
         value={newSearch}
