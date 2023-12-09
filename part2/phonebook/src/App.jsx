@@ -38,7 +38,7 @@ const Filter = ({ value, onChange }) => {
   )
 }
 
-const Persons = ({ persons, newSearch }) => {
+const Persons = ({ persons, newSearch, delPersonClick }) => {
   return (
     <div>
       {persons.filter(
@@ -46,16 +46,19 @@ const Persons = ({ persons, newSearch }) => {
           return person.name.toLowerCase().includes(newSearch.toLowerCase())
         }
       ).map(person =>
-        <Person key={person.name} person={person} />
+        <Person key={person.name} person={person} delPersonClick={delPersonClick} />
       )}
     </div>
   )
 }
 
-const Person = ({ person }) => {
+const Person = ({ person, delPersonClick }) => {
   return (
     <div>
       <p>{person.name} {person.number}</p>
+      <button onClick={() => delPersonClick(person.name, person.id)}>
+      delete {person.id}
+      </button>
     </div>
   )
 }
@@ -101,6 +104,22 @@ const App = () => {
     setNewNumber('')
   }
 
+  const delPersonClick = (name, id) => {
+    if (window.confirm(`Delete ${name}?`)) {
+      personService
+        .deletePerson(id)
+        .then(returnedPerson => {
+          setPersons(persons.filter(person => person.id !== id))
+          console.log(`Person deleted: ${name}`)
+        })
+        .catch(error => {
+          console.log('fail')
+          console.log(error)
+        })
+    }
+    console.log(`Person deletion cancelled`)
+  }
+
   const handleSearchedPersonChange = (event) => {
     console.log(event.target.value)
     setNewSearch(event.target.value)
@@ -140,6 +159,7 @@ const App = () => {
       <Persons
         persons={persons}
         newSearch={newSearch}
+        delPersonClick={delPersonClick}
       />
 
     </div>
