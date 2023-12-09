@@ -80,6 +80,18 @@ const SuccessfulNotification = ({ message }) => {
   )
 }
 
+const ErrorNotification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className='error'>
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
 
@@ -87,6 +99,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [newSearch, setNewSearch] = useState('')
   const [successfulMessage, setSuccessfulMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     console.log('effect')
@@ -123,6 +136,10 @@ const App = () => {
             console.log(`Person: ${returnedPerson.name} number updated`)
           })
           .catch(error => {
+            setErrorMessage(
+              `Person '${newName}' was already removed from server`
+            )
+            setTimeout(() => {setErrorMessage(null)}, 5000)
             console.log('failed to update person')
             console.log(error)
           })
@@ -181,6 +198,7 @@ const App = () => {
       <h2>Phonebook</h2>
 
       <SuccessfulNotification message={successfulMessage} />
+      <ErrorNotification message={errorMessage} />
 
       <Filter
         value={newSearch}
