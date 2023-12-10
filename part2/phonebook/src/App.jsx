@@ -1,5 +1,6 @@
 import { useState, useEffect} from 'react'
 import personService from './services/persons'
+import './index.css'
 
 const PersonForm = ({ addPerson,
   newName,
@@ -67,12 +68,38 @@ const Person = ({ person, delPersonClick }) => {
   )
 }
 
+const SuccessfulNotification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className='successful'>
+      {message}
+    </div>
+  )
+}
+
+const ErrorNotification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className='error'>
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newSearch, setNewSearch] = useState('')
+  const [successfulMessage, setSuccessfulMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     console.log('effect')
@@ -104,9 +131,15 @@ const App = () => {
                 ? person
                 : returnedPerson
             ))
+            setSuccessfulMessage(`Number of ${returnedPerson.name} updated`)
+            setTimeout(() => {setSuccessfulMessage(null)}, 5000)
             console.log(`Person: ${returnedPerson.name} number updated`)
           })
           .catch(error => {
+            setErrorMessage(
+              `Person '${newName}' was already removed from server`
+            )
+            setTimeout(() => {setErrorMessage(null)}, 5000)
             console.log('failed to update person')
             console.log(error)
           })
@@ -116,6 +149,8 @@ const App = () => {
         .create(personObject)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
+          setSuccessfulMessage(`Added ${returnedPerson.name}`)
+          setTimeout(() => {setSuccessfulMessage(null)}, 5000)
           console.log(`New person added: ${returnedPerson.name}`)
         })
         .catch(error => {
@@ -161,6 +196,9 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <SuccessfulNotification message={successfulMessage} />
+      <ErrorNotification message={errorMessage} />
 
       <Filter
         value={newSearch}
