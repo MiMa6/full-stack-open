@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import countryService from './services/countries'
+import weatherService from './services/weather'
 
 const Filter = ({ value, onChange }) => {
   return (
@@ -14,12 +15,20 @@ const Filter = ({ value, onChange }) => {
   )
 }
 
-const Countries = ({ countries, handleShowCountry }) => {
+const Countries = ({ countries, handleShowCountry, getWeatherhandler, weather }) => {
 
   if (countries.length === 1) {
     return (
       <div>
-        <CountrySpecific country={countries[0]} />
+        <CountrySpecificMain
+          country={countries[0]}
+        />
+        <CountrySpecificWeather
+          country={countries[0]}
+          getWeatherhandler={getWeatherhandler}
+          weather={weather}
+        />
+
       </div>
     )
   } else if (countries.length < 10) {
@@ -57,7 +66,8 @@ const CountryList = ({ country, handleShowCountry }) => {
   )
 }
 
-const CountrySpecific = ({ country }) => {
+const CountrySpecificMain = ({ country }) => {
+
   return (
     <div>
       <h1>{country.name.common}</h1>
@@ -65,7 +75,7 @@ const CountrySpecific = ({ country }) => {
       <p>capital {country.capital}</p>
       <p>area {country.area}</p>
 
-      <h2>languages:</h2>
+      <b>languages:</b>
 
       <ul>
         {Object.values(country.languages).map(language =>
@@ -79,10 +89,43 @@ const CountrySpecific = ({ country }) => {
   )
 }
 
+const CountrySpecificWeather = ({ country, getWeatherhandler, weather }) => {
+
+
+  useEffect(() => {
+    getWeatherhandler(country.capital);
+  }, [country]);
+
+  if (weather.temp === 0 && weather.speed === 0 && weather.img === '') {
+    return (
+      <div>
+        <h2>No weather data available</h2>
+      </div>
+    )
+  } else {
+    return (
+      <div>
+        <h2>Weather in {country.capital}</h2>
+        <p>temperature {weather.temp} Celcius</p>
+        <img src={`https://openweathermap.org/img/wn/${weather.img}@2x.png`} alt="weather icon" width="100" height="100"></img>
+        <p>wind {weather.speed}m/s</p>
+      </div>
+    )
+  }
+
+
+
+}
+
 function App() {
   const [countries, setCountries] = useState([])
-  const [countryToShow, setCountryToShow] = useState('')
   const [newSearch, setNewSearch] = useState('')
+  const [countryToShow, setCountryToShow] = useState('')
+  const [weather, setWeather] = useState({
+    temp: 0,
+    speed: 0,
+    img: '',
+  })
 
   useEffect(() => {
     console.log('Initial effect')
@@ -94,18 +137,51 @@ function App() {
       })
   }, [])
 
-
-
   const handleSearchedCountryChange = (event) => {
-    console.log(event.target.value)
     setNewSearch(event.target.value)
     setCountryToShow('')
+    setWeather({
+      temp: 0,
+      speed: 0,
+      img: '',
+    })
   }
-  
-  const handleShowCountry = (name) => {
-    console.log(`Add country to show ${name}`)
-    setCountryToShow(name)
+
+  const handleShowCountry = (countryName) => {
+    console.log(`Add country to show ${countryName}`)
+    setCountryToShow(countryName)
   }
+
+  const getWeatherhandler = (city) => {
+    weatherService
+      .getGeoByCity(city)
+      .then(geoData => {
+        console.log("geoData found")
+        console.log(geoData)
+        let lat = geoData[0].lat.toFixed(2)
+        let lon = geoData[0].lon.toFixed(2)
+        weatherService
+          .getWeatherByGeo(lat, lon)
+          .then(weatherData => {
+            console.log("weatherData found")
+            console.log(weatherData)
+            setWeather({
+              temp: (weatherData.main.temp).toFixed(2),
+              speed: (weatherData.wind.speed).toFixed(2),
+              img: (weatherData.weather[0].icon),
+            })
+          })
+          .catch(error => {
+            console.log('Failed to get weather data')
+            console.log(error)
+          })
+      })
+      .catch(error => {
+        console.log('Failed to get geo data')
+        console.log(error)
+      })
+  }
+
 
   var filteredCountries = countries.filter(country => {
     return country.name.common.toLowerCase().includes(newSearch.toLowerCase())
@@ -116,9 +192,7 @@ function App() {
       return country.name.common === countryToShow
     })
   }
-
-  console.log(`Countries found: ${filteredCountries.length}`)
-
+  
   return (
 
     <div>
@@ -132,6 +206,8 @@ function App() {
         countries={filteredCountries}
         newSearch={newSearch}
         handleShowCountry={handleShowCountry}
+        getWeatherhandler={getWeatherhandler}
+        weather={weather}
       />
 
     </div>
