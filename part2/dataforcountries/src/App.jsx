@@ -14,24 +14,24 @@ const Filter = ({ value, onChange }) => {
   )
 }
 
-const Countries = ({ countries, newSearch }) => {
+const Countries = ({ countries, handleShowCountry }) => {
 
-  const filteredCountries = countries.filter(country => {
-    return country.name.common.toLowerCase().includes(newSearch.toLowerCase())
-  })
-  console.log(filteredCountries.length)
-  if (filteredCountries.length === 1) {
+  if (countries.length === 1) {
     return (
       <div>
-        <CountrySpecific country={filteredCountries[0]} />
+        <CountrySpecific country={countries[0]} />
       </div>
     )
-  } else if (filteredCountries.length < 10) {
+  } else if (countries.length < 10) {
     return (
       <div>
-        {filteredCountries
+        {countries
           .map(country =>
-            <CountryList key={country.name} country={country} />
+            <CountryList
+              key={country.name.common}
+              country={country}
+              handleShowCountry={handleShowCountry}
+            />
           )}
       </div>
     )
@@ -45,10 +45,14 @@ const Countries = ({ countries, newSearch }) => {
 
 }
 
-const CountryList = ({ country }) => {
+const CountryList = ({ country, handleShowCountry }) => {
   return (
     <div>
-      <p>{country.name.common}</p>
+      <p>{country.name.common}
+        <button onClick={() => handleShowCountry(country.name.common)}>
+          show
+        </button>
+      </p>
     </div>
   )
 }
@@ -77,6 +81,7 @@ const CountrySpecific = ({ country }) => {
 
 function App() {
   const [countries, setCountries] = useState([])
+  const [countryToShow, setCountryToShow] = useState('')
   const [newSearch, setNewSearch] = useState('')
 
   useEffect(() => {
@@ -89,13 +94,33 @@ function App() {
       })
   }, [])
 
+
+
   const handleSearchedCountryChange = (event) => {
     console.log(event.target.value)
     setNewSearch(event.target.value)
+    setCountryToShow('')
+  }
+  
+  const handleShowCountry = (name) => {
+    console.log(`Add country to show ${name}`)
+    setCountryToShow(name)
   }
 
+  var filteredCountries = countries.filter(country => {
+    return country.name.common.toLowerCase().includes(newSearch.toLowerCase())
+  })
+
+  if (countryToShow != '') {
+    filteredCountries = filteredCountries.filter(country => {
+      return country.name.common === countryToShow
+    })
+  }
+
+  console.log(`Countries found: ${filteredCountries.length}`)
 
   return (
+
     <div>
 
       <Filter
@@ -104,8 +129,9 @@ function App() {
       />
 
       <Countries
-        countries={countries}
+        countries={filteredCountries}
         newSearch={newSearch}
+        handleShowCountry={handleShowCountry}
       />
 
     </div>
