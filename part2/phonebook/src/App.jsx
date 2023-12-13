@@ -136,9 +136,7 @@ const App = () => {
             console.log(`Person: ${returnedPerson.name} number updated`)
           })
           .catch(error => {
-            setErrorMessage(
-              `Person '${newName}' was already removed from server`
-            )
+            setErrorMessage(error.response.data.error)
             setTimeout(() => {setErrorMessage(null)}, 5000)
             console.log('failed to update person')
             console.log(error)
