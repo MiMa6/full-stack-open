@@ -154,6 +154,8 @@ const App = () => {
           console.log(`New person added: ${returnedPerson.name}`)
         })
         .catch(error => {
+          setErrorMessage(error.response.data.error)
+          setTimeout(() => {setErrorMessage(null)}, 5000)
           console.log('failed to add person')
           console.log(error)
         })
@@ -174,8 +176,9 @@ const App = () => {
           console.log('failed to delete person')
           console.log(error)
         })
+    } else {
+      console.log(`Person deletion cancelled`)
     }
-    console.log(`Person deletion cancelled`)
   }
 
   const handleSearchedPersonChange = (event) => {
