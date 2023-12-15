@@ -1,6 +1,6 @@
 # Full Stack Open - Part 1
 
-## [Part1a&b](https://github.com/MiMa6/full-stack-open/pull/2/files)
+## [Part1a&b](https://github.com/MiMa6/full-stack-open/pull/2)
 
 ### Course information
 <ul>
